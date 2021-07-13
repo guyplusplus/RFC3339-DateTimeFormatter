@@ -19,7 +19,7 @@ DateTimeFormatter rfc3339Formatter = new DateTimeFormatterBuilder()
         .appendLiteral(':')
         .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
         .optionalStart()
-        .appendFraction(ChronoField.NANO_OF_SECOND, 2, 9, true) //2nd parameter: 2 for JRE 11, 1 for JRE 16
+        .appendFraction(ChronoField.NANO_OF_SECOND, 2, 9, true) //2nd parameter: 2 for JRE (8, 11), 1 for JRE (16, 17)
         .optionalEnd()
         .appendOffset("+HH:MM","Z")
         .toFormatter()
