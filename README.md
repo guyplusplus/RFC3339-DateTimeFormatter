@@ -4,7 +4,7 @@ This is a very simple JAVA code to test a custom build DateTimeFormatter to acco
 
 This works very well, with the only **exception of leap second** date time.
 
-``JAVA
+```JAVA
 DateTimeFormatter rfc3339Formatter = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
         .appendValue(ChronoField.YEAR, 4)
@@ -24,4 +24,4 @@ DateTimeFormatter rfc3339Formatter = new DateTimeFormatterBuilder()
         .appendOffset("+HH:MM","Z")
         .toFormatter()
         .withResolverStyle(ResolverStyle.STRICT);
-``
+```
