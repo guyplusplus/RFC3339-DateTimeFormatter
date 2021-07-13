@@ -29,7 +29,7 @@ public class RFC3339DataTimeFormatterTest {
     			.appendLiteral(':')
     			.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
     			.optionalStart()
-    			.appendFraction(ChronoField.NANO_OF_SECOND, 2, 9, true) //2nd parameter: 2 for JRE (8, 11), 1 for JRE (16, 17)
+    			.appendFraction(ChronoField.NANO_OF_SECOND, 2, 9, true) //2nd parameter: 2 for JRE (8, 11 LTS), 1 for JRE (17 LTS)
     			.optionalEnd()
     			.appendOffset("+HH:MM","Z")
     			.toFormatter()
@@ -100,6 +100,7 @@ public class RFC3339DataTimeFormatterTest {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ)); //no TZ
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "Z-08:00")); //wired TZ
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "Z08:00")); //wired TZ
+        Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+08:00Z")); //wired TZ
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+2:00")); //TZ 1 digit hour
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+:00")); //TZ 0 digit hour
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+02:3")); //TZ 1 digit minute
@@ -127,11 +128,11 @@ public class RFC3339DataTimeFormatterTest {
     }
     
     /**
-     * This test succeeds on JDK11 but fails on JDK 8...
+     * This test succeeds on JDK11 up but fails on JDK 8...
      */
     @Test
     void testParsingInvalidDateTimesOnJDK11() {
-        Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("2019-07-19T10:14:39.812+08:00:30")); //seconds in TZ
+    	Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("2019-07-19T10:14:39.812+08:00:30")); //seconds in TZ
     }
     
     @Test
