@@ -14,7 +14,6 @@ public class RFC3339DataTimeFormatterTest {
 
     public static DateTimeFormatter rfc3339Formatter = null;
     
-    
     static {
     	rfc3339Formatter = new DateTimeFormatterBuilder()
     			.parseCaseInsensitive()
@@ -41,16 +40,19 @@ public class RFC3339DataTimeFormatterTest {
         return ZonedDateTime.parse(rfcDateTime, rfc3339Formatter);
     }
 
-    @Test void testHourWithTimezone() {
+    @Test
+    void testHourWithTimezone() {
         Assertions.assertEquals("2019-07-19T11:44:39.812Z", parseRfc3339("2019-07-19T10:14:39.812-01:30").withZoneSameInstant(ZoneOffset.UTC).toString());
         Assertions.assertEquals("2019-07-19T11:44:39.810Z", parseRfc3339("2019-07-19T10:14:39.81-01:30").withZoneSameInstant(ZoneOffset.UTC).toString());
         Assertions.assertEquals("2019-07-19T11:44:39.010Z", parseRfc3339("2019-07-19T10:14:39.01-01:30").withZoneSameInstant(ZoneOffset.UTC).toString());
+        Assertions.assertEquals("2019-07-19T10:14:39.01-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(parseRfc3339("2019-07-19T10:14:39.01-01:30")));
         Assertions.assertEquals("2019-07-19T11:44:39.812300Z", parseRfc3339("2019-07-19T10:14:39.8123-01:30").withZoneSameInstant(ZoneOffset.UTC).toString());
         int hour = parseRfc3339("2019-07-19T10:14:39.812+01:00").withZoneSameInstant(ZoneOffset.UTC).getHour();
         Assertions.assertEquals(9, hour);
     }
 
-    @Test void testFormatter() {
+    @Test
+    void testFormatter() {
         String sample = "2019-07-19T10:14:39.0123-01:30";
         Assertions.assertEquals(sample, rfc3339Formatter.format(parseRfc3339(sample)));
         sample = "2019-07-19t10:14:39.0123z";
@@ -59,7 +61,8 @@ public class RFC3339DataTimeFormatterTest {
         Assertions.assertEquals(sample.replace("+00:00", "Z"), rfc3339Formatter.format(parseRfc3339(sample)));
     }
     
-    @Test void testUnknownLocalOffset() {
+    @Test
+    void testUnknownLocalOffset() {
         int hour = parseRfc3339("2019-07-19T10:14:39.812-00:00").withZoneSameInstant(ZoneOffset.UTC).getHour();
         Assertions.assertEquals(10, hour);
     }
@@ -68,13 +71,15 @@ public class RFC3339DataTimeFormatterTest {
      * Examples are taken from <a href="https://www.ietf.org/rfc/rfc3339.txt"> RFC 3339 standard </a>
      * Except Leap Second which fails
      */
-    @Test void testParsingDifferentDateTimes1() {
+    @Test
+    void testParsingDifferentDateTimes1() {
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.52Z"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1996-12-19T16:39:57-08:00"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1937-01-01T12:00:27.87+00:20"));
     }
 
-    @Test void testParsingDifferentDateTimes2() {
+    @Test
+    void testParsingDifferentDateTimes2() {
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12t23:20:50z")); //small letters
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.0Z"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.1Z"));
@@ -83,11 +88,12 @@ public class RFC3339DataTimeFormatterTest {
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.520Z"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.521Z"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1996-12-19T16:39:57+08:00"));
-        Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.123456789Z")); //nanosecs
+        Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.123456789Z")); //nanoseconds
         Assertions.assertDoesNotThrow(exParseRfc3339("2020-02-29T23:20:50Z")); //29-Feb on leap year
     }
 
-    @Test void testParsingInvalidTZ() {
+    @Test
+    void testParsingInvalidTZ() {
         String okDateTimeNoMsNoTZ = "1996-12-19T16:39:57";
         Assertions.assertDoesNotThrow(exParseRfc3339(okDateTimeNoMsNoTZ + "Z"));
         
@@ -102,9 +108,13 @@ public class RFC3339DataTimeFormatterTest {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+24:00")); //TZ with hours >= 24
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+0800")); //no column in TZ
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+08:00:")); //2 columns in TZ
+        Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "08:00")); //no sign in TZ
+        Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "00:00")); //no sign in TZ
+        Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + " +08:00")); //space in TZ
     }
     
-    @Test void testParsingInvalidDateTimes() {
+    @Test
+    void testParsingInvalidDateTimes() {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("2021-02-29T23:20:50Z")); //29-Feb on non leap year
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("1985-04-12T23:20Z")); //no second
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("1985-4-12T23:20:50.52Z")); //1 digit month
@@ -119,11 +129,13 @@ public class RFC3339DataTimeFormatterTest {
     /**
      * This test succeeds on JDK11 but fails on JDK 8...
      */
-    @Test void testParsingInvalidDateTimesOnJDK11() {
+    @Test
+    void testParsingInvalidDateTimesOnJDK11() {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("2019-07-19T10:14:39.812+08:00:30")); //seconds in TZ
     }
     
-    @Test void testLeapSeconds_WRONG_PARSING() {
+    @Test
+    void testLeapSeconds_WRONG_PARSING() {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("1990-12-31T23:59:60Z"));
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("1990-12-31T15:59:60-08:00"));
     }
