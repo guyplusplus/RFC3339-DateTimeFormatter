@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 
 public class RFC3339DataTimeFormatterTest {
 
@@ -139,6 +140,12 @@ public class RFC3339DataTimeFormatterTest {
     void testLeapSeconds_WRONG_PARSING() {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("1990-12-31T23:59:60Z"));
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339("1990-12-31T15:59:60-08:00"));
+    }
+    
+    @Test
+    void testFormat() {
+    	Assertions.assertEquals("2019-07-19T10:14:39.812-01:30",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.812-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     }
     
     private static Executable exParseRfc3339(String toParse) {
