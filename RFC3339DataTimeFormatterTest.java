@@ -145,6 +145,19 @@ public class RFC3339DataTimeFormatterTest {
     void testFormat() {
     	Assertions.assertEquals("2019-07-19T10:14:39.812-01:30",
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.812-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2019-07-19T10:14:39.81-01:30",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.81-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	
+    	//due to parser bug where JDK 11 and 17 differ for example, hence 2nd parameter needs to be different,
+    	//the formatter outputs then a bit differently with different nummber of decimals: 2 for JRE (8, 11 LTS), 1 for JRE (17 LTS)
+    	String output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.8-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.80-01:30") || output.equals("2019-07-19T10:14:39.8-01:30"));
+    	output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.0-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.00-01:30") || output.equals("2019-07-19T10:14:39.0-01:30"));
+    	output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.0-01:30") || output.equals("2019-07-19T10:14:39.00-01:30"));
+    	output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.0-01:30") || output.equals("2019-07-19T10:14:39.00-01:30"));
     }
     
     private static Executable exParseRfc3339(String toParse) {
