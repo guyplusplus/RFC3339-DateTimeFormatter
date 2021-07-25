@@ -5,7 +5,7 @@ This is a very simple JAVA code to test a DateTimeFormatter designed to strickly
 This works very well, with the only **exception of leap second** date time.
 
 ```JAVA
-DateTimeFormatter rfc3339Formatter = new DateTimeFormatterBuilder()
+DateTimeFormatter rfc3339Parser = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
         .appendValue(ChronoField.YEAR, 4)
         .appendLiteral('-')
@@ -23,5 +23,8 @@ DateTimeFormatter rfc3339Formatter = new DateTimeFormatterBuilder()
         .optionalEnd()
         .appendOffset("+HH:MM","Z")
         .toFormatter()
-        .withResolverStyle(ResolverStyle.STRICT);
+        .withResolverStyle(ResolverStyle.STRICT)
+        .withChronology(IsoChronology.INSTANCE);
+
+DateTimeFormatter rfc3339Formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 ```

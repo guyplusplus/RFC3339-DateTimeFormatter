@@ -4,6 +4,7 @@ import org.junit.jupiter.api.function.Executable;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
@@ -12,10 +13,11 @@ import java.time.temporal.ChronoField;
 
 public class RFC3339DataTimeFormatterTest {
 
+    public static DateTimeFormatter rfc3339Parser = null;
     public static DateTimeFormatter rfc3339Formatter = null;
     
     static {
-    	rfc3339Formatter = new DateTimeFormatterBuilder()
+    	rfc3339Parser = new DateTimeFormatterBuilder()
     			.parseCaseInsensitive()
     			.appendValue(ChronoField.YEAR, 4)
     			.appendLiteral('-')
@@ -31,13 +33,15 @@ public class RFC3339DataTimeFormatterTest {
     			.optionalStart()
     			.appendFraction(ChronoField.NANO_OF_SECOND, 2, 9, true) //2nd parameter: 2 for JRE (8, 11 LTS), 1 for JRE (17 LTS)
     			.optionalEnd()
-    			.appendOffset("+HH:MM","Z")
-    			.toFormatter()
-    			.withResolverStyle(ResolverStyle.STRICT);
+    			.appendOffset("+HH:MM","Z")    			.toFormatter()
+    			.withResolverStyle(ResolverStyle.STRICT)
+    			.withChronology(IsoChronology.INSTANCE);
+    	
+    	rfc3339Formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
     }
 
     public static ZonedDateTime parseRfc3339(String rfcDateTime) {
-        return ZonedDateTime.parse(rfcDateTime, rfc3339Formatter);
+        return ZonedDateTime.parse(rfcDateTime, rfc3339Parser);
     }
 
     @Test
@@ -54,11 +58,11 @@ public class RFC3339DataTimeFormatterTest {
     @Test
     void testFormatter() {
         String sample = "2019-07-19T10:14:39.0123-01:30";
-        Assertions.assertEquals(sample, rfc3339Formatter.format(parseRfc3339(sample)));
+        Assertions.assertEquals(sample, rfc3339Parser.format(parseRfc3339(sample)));
         sample = "2019-07-19t10:14:39.0123z";
-        Assertions.assertEquals(sample.toUpperCase(), rfc3339Formatter.format(parseRfc3339(sample)));
+        Assertions.assertEquals(sample.toUpperCase(), rfc3339Parser.format(parseRfc3339(sample)));
         sample = "2019-07-19T10:14:39.0123+00:00";
-        Assertions.assertEquals(sample.replace("+00:00", "Z"), rfc3339Formatter.format(parseRfc3339(sample)));
+        Assertions.assertEquals(sample.replace("+00:00", "Z"), rfc3339Parser.format(parseRfc3339(sample)));
     }
     
     @Test
@@ -147,17 +151,16 @@ public class RFC3339DataTimeFormatterTest {
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.812-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     	Assertions.assertEquals("2019-07-19T10:14:39.81-01:30",
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.81-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
-    	
-    	//due to parser bug where JDK 11 and 17 differ for example, hence 2nd parameter needs to be different,
-    	//the formatter outputs then a bit differently with different nummber of decimals: 2 for JRE (8, 11 LTS), 1 for JRE (17 LTS)
-    	String output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.8-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.80-01:30") || output.equals("2019-07-19T10:14:39.8-01:30"));
-    	output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.0-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.00-01:30") || output.equals("2019-07-19T10:14:39.0-01:30"));
-    	output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.0-01:30") || output.equals("2019-07-19T10:14:39.00-01:30"));
-    	output = rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    	Assertions.assertTrue(output.equals("2019-07-19T10:14:39.0-01:30") || output.equals("2019-07-19T10:14:39.00-01:30"));
+    	Assertions.assertEquals("2019-07-19T10:14:39.8-01:30",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.8-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2019-07-19T10:14:39-01:30",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.0-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2019-07-19T10:14:39-01:30",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2019-07-19T10:14:39-01:30",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2019-07-19T10:14:39Z",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     }
     
     private static Executable exParseRfc3339(String toParse) {
