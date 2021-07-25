@@ -2,6 +2,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.chrono.IsoChronology;
@@ -159,8 +163,30 @@ public class RFC3339DataTimeFormatterTest {
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     	Assertions.assertEquals("2019-07-19T10:14:39-01:30",
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2019-07-09T10:14:39-01:00",
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-09T10:14:39-01", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     	Assertions.assertEquals("2019-07-19T10:14:39Z",
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    	Assertions.assertEquals("2021-11-09T06:07:00-08:00",
+    			rfc3339Formatter.format(ZonedDateTime.of(
+    					LocalDateTime.of(LocalDate.of(2021, 11, 9), LocalTime.of(6, 7)),
+    					ZoneId.of("America/Los_Angeles"))));
+    	Assertions.assertEquals("2021-11-09T06:07:08.000000123-08:00",
+    			rfc3339Formatter.format(ZonedDateTime.of(
+    					LocalDateTime.of(LocalDate.of(2021, 11, 9), LocalTime.of(6, 7, 8, 123)),
+    					ZoneId.of("America/Los_Angeles"))));
+    	Assertions.assertEquals("2021-11-09T06:07:08.000000123-08:00",
+    			rfc3339Formatter.format(ZonedDateTime.of(
+    					LocalDateTime.of(LocalDate.of(2021, 11, 9), LocalTime.of(6, 7, 8, 123)),
+    					ZoneId.of("America/Los_Angeles"))));
+    	Assertions.assertEquals("2021-11-09T06:07:08.000123-08:00",
+    			rfc3339Formatter.format(ZonedDateTime.of(
+    					LocalDateTime.of(LocalDate.of(2021, 11, 9), LocalTime.of(6, 7, 8, 123000)),
+    					ZoneId.of("America/Los_Angeles"))));
+    	Assertions.assertEquals("2021-11-09T06:07:08-08:00",
+    			rfc3339Formatter.format(ZonedDateTime.of(
+    					LocalDateTime.of(LocalDate.of(2021, 11, 9), LocalTime.of(6, 7, 8, 0)),
+    					ZoneId.of("America/Los_Angeles"))));
     }
     
     private static Executable exParseRfc3339(String toParse) {
