@@ -1,6 +1,6 @@
 # RFC3339 DateTimeFormatter
 
-This is a very simple JAVA code to test a DateTimeFormatter designed to strickly parse [RFC3339 Internet date/time format](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6), such as `1996-12-19T16:39:57-08:00`.
+This is a very simple JAVA code to test a DateTimeFormatter designed to **strickly** parse [RFC3339 Internet date/time format](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6), such as `1996-12-19T16:39:57-08:00`.
 
 This works very well, with the only **exception of leap second** date time.
 
