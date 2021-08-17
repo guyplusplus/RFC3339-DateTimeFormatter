@@ -82,6 +82,8 @@ public class RFC3339DataTimeFormatterTest {
     @Test
     void testParsingDifferentDateTimes1() {
         Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.52Z"));
+        Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.52+00:00"));
+        Assertions.assertDoesNotThrow(exParseRfc3339("1985-04-12T23:20:50.52-00:00"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1996-12-19T16:39:57-08:00"));
         Assertions.assertDoesNotThrow(exParseRfc3339("1937-01-01T12:00:27.87+00:20"));
     }
@@ -115,6 +117,7 @@ public class RFC3339DataTimeFormatterTest {
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+02:")); //TZ 0 digit minute
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+02")); //TZ no minutes
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+24:00")); //TZ with hours >= 24
+        Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "-24:00")); //TZ with hours <= -24
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+0800")); //no column in TZ
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "+08:00:")); //2 columns in TZ
         Assertions.assertThrows(DateTimeParseException.class, exParseRfc3339(okDateTimeNoMsNoTZ + "08:00")); //no sign in TZ
@@ -164,7 +167,7 @@ public class RFC3339DataTimeFormatterTest {
     	Assertions.assertEquals("2019-07-19T10:14:39-01:30",
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39-01:30", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     	Assertions.assertEquals("2019-07-09T10:14:39-01:00",
-    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-09T10:14:39-01", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+    			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-09T10:14:39-01:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     	Assertions.assertEquals("2019-07-19T10:14:39Z",
     			rfc3339Formatter.format(ZonedDateTime.parse("2019-07-19T10:14:39.Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
     	Assertions.assertEquals("2021-11-09T06:07:00-08:00",
